@@ -1,0 +1,24 @@
+{
+  "name": "ws-desktop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EkholmR/ws-desktop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EkholmR/ws-desktop/issues"
+  },
+  "homepage": "https://github.com/EkholmR/ws-desktop#readme",
+  "devDependencies": {
+    "electron": "^44.9.0"
+  }
+}

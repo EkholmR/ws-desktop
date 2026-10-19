@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebSocket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>WebSocket Klient</h1>
+    <p class="lede">Text du skickar här visas direkt på alla enheter där du är inloggad.</p>
+
+    <!-- Shown when logged out -->
+    <section id="login-section">
+      <p id="login-message" class="notice" role="alert"></p>
+      <form id="login-form">
+        <label for="username">Användarnamn</label>
+        <input id="username" type="text" autocomplete="username" required>
+
+        <label for="password">Lösenord</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+
+        <button type="submit" class="primary">Logga in</button>
+      </form>
+    </section>
+
+    <!-- Shown when logged in -->
+    <section id="app-section" hidden>
+      <div class="toolbar">
+        <span id="status" class="status disconnected">Frånkopplad</span>
+        <button id="reconnect-btn" type="button">Återanslut</button>
+        <button id="logout-btn" type="button">Logga ut</button>
+      </div>
+
+      <label for="message-input">Meddelande</label>
+      <textarea id="message-input" placeholder="Skriv eller klistra in text"></textarea>
+      <div class="send-row">
+        <span class="hint">Ctrl + Enter skickar</span>
+        <button id="send-btn" type="button" class="primary">Skicka</button>
+      </div>
+
+      <h2>Mottaget</h2>
+      <ul id="messages"></ul>
+      <p class="empty">Inget har kommit än. Skriv något ovan, så visas det på alla dina enheter.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

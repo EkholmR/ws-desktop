@@ -1,0 +1,222 @@
+:root {
+  --bg: #e9eef3;
+  --surface: #ffffff;
+  --ink: #16212c;
+  --muted: #566575;
+  --line: #c7d1db;
+  --accent: #2457f5;
+  --ok: #1b7f50;
+  --wait: #b9740f;
+  --bad: #b83227;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+h1, h2 {
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 7vw, 3rem);
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.35rem;
+  margin: 2.25rem 0 0.75rem;
+}
+
+.lede {
+  color: var(--muted);
+  margin: 0 0 2rem;
+  max-width: 32rem;
+}
+
+/* Forms */
+label {
+  display: block;
+  font-weight: 600;
+  margin: 1rem 0 0.35rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.8rem;
+}
+
+textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Buttons */
+button {
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+}
+
+button:hover { border-color: var(--ink); }
+
+button.primary {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+button.primary:hover { background: #1a45cc; border-color: #1a45cc; }
+
+#login-form button.primary { margin-top: 1.25rem; }
+
+/* Notice shown above the login form (expired session, errors) */
+.notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border-left: 4px solid var(--wait);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.notice:empty { display: none; }
+
+/* Connection status */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-right: auto;
+  font-weight: 600;
+}
+
+.status::before {
+  content: "";
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--bad);
+}
+
+.status.connected::before { background: var(--ok); }
+.status.connecting::before {
+  background: var(--wait);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.25; }
+}
+
+/* Composer */
+.send-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.6rem;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Received messages */
+#messages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+#messages li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "text copy"
+    "time copy";
+  gap: 0.15rem 1rem;
+  align-items: start;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+}
+
+.msg-text {
+  grid-area: text;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.msg-time {
+  grid-area: time;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.copy-btn {
+  grid-area: copy;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.7rem;
+}
+
+/* Empty state: hidden as soon as the list has a message */
+.empty {
+  color: var(--muted);
+  margin: 0;
+  padding: 1.25rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+#messages:not(:empty) + .empty { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .status.connecting::before { animation: none; }
+}
