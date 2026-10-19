@@ -3,7 +3,6 @@ const CONFIG = {
   WS_URL: 'wss://websocket-server-npvo.onrender.com'
 };
 
-const TOKEN_KEY = 'jwt'; // temporary: replaced by safeStorage in step 3
 const USERNAME_KEY = 'lastUsername';
 
 const loginSection = document.getElementById('login-section');
@@ -21,9 +20,10 @@ const messagesEl = document.getElementById('messages');
 
 let socket = null;
 let expiryTimer = null;
+let currentToken = null; // memory only; the encrypted copy is kept by the main process
 
 function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
+  return currentToken;
 }
 
 // Read the payload of a JWT (no verification, the server does that)
@@ -52,8 +52,14 @@ function scheduleExpiry(token) {
   expiryTimer = setTimeout(expireSession, Math.min(Math.max(msLeft, 0), 2147483647));
 }
 
+// Forget the token both in memory and in the main process's storage
+function endSession() {
+  currentToken = null;
+  window.native.logout();
+}
+
 function expireSession() {
-  localStorage.removeItem(TOKEN_KEY);
+  endSession();
   showLoggedOut('Din inloggning har gått ut. Logga in igen.');
 }
 
@@ -144,7 +150,6 @@ function connect() {
     const current = getToken();
     if (current && isExpired(current)) expireSession();
   };
-  // Browsers give no details about a failed connection; onclose follows anyway
   ws.onerror = () => {};
 }
 
@@ -182,8 +187,8 @@ loginForm.addEventListener('submit', async (event) => {
     return;
   }
 
-  localStorage.setItem(TOKEN_KEY, result.token); // temporary, replaced in step 3
-  localStorage.setItem(USERNAME_KEY, username);  // the password is never stored
+  currentToken = result.token;
+  localStorage.setItem(USERNAME_KEY, username); // the password is never stored
   loginForm.reset();
   showLoggedIn();
 });
@@ -201,17 +206,23 @@ messageInput.addEventListener('keydown', (event) => {
 reconnectBtn.addEventListener('click', connect);
 
 logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem(TOKEN_KEY);
+  endSession();
   messagesEl.innerHTML = '';
   showLoggedOut();
 });
 
-// On page load: stay logged in only if there is a token that hasn't expired
-const storedToken = getToken();
-if (storedToken && !isExpired(storedToken)) {
-  showLoggedIn();
-} else if (storedToken) {
-  expireSession(); // stale token from an earlier visit
-} else {
-  showLoggedOut();
-}
+// On startup: remove any token left in localStorage by the earlier steps,
+// then ask the main process for the stored token
+(async () => {
+  localStorage.removeItem('jwt');
+
+  currentToken = await window.native.getToken();
+
+  if (currentToken && !isExpired(currentToken)) {
+    showLoggedIn();
+  } else if (currentToken) {
+    expireSession(); // stale token from an earlier session
+  } else {
+    showLoggedOut();
+  }
+})();

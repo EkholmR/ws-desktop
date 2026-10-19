@@ -1,8 +1,35 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, safeStorage } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 // Your deployed login service
 const LOGIN_URL = 'https://wom-p2-del3.onrender.com/api/auth/login';
+
+// The encrypted token lives in the app's own data folder
+const tokenFile = () => path.join(app.getPath('userData'), 'token.bin');
+
+function saveToken(token) {
+  if (!safeStorage.isEncryptionAvailable()) return false; // never store it unencrypted
+  fs.writeFileSync(tokenFile(), safeStorage.encryptString(token));
+  return true;
+}
+
+function loadToken() {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) return null;
+    return safeStorage.decryptString(fs.readFileSync(tokenFile()));
+  } catch (err) {
+    return null; // no file yet, or it can't be decrypted
+  }
+}
+
+function clearToken() {
+  try {
+    fs.unlinkSync(tokenFile());
+  } catch (err) {
+    // nothing stored
+  }
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -37,11 +64,16 @@ ipcMain.handle('auth:login', async (event, credentials) => {
     if (!response.ok) {
       return { ok: false, error: data.error || `Inloggningen misslyckades (${response.status})` };
     }
+
+    saveToken(data.token); // encrypted on disk; if encryption isn't available, memory only
     return { ok: true, token: data.token };
   } catch (err) {
     return { ok: false, error: 'Kunde inte nå inloggningstjänsten. Kontrollera adressen och att servern kör.' };
   }
 });
+
+ipcMain.handle('auth:getToken', () => loadToken());
+ipcMain.handle('auth:logout', () => { clearToken(); });
 
 app.whenReady().then(() => {
   createWindow();
