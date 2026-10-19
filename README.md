@@ -14,4 +14,4 @@ Electron app that ports the browser client to the desktop. Connects to the WebSo
 - **Login** is requested in the main process (`main.js`), not the page, so the browser's CORS rules don't apply. The page reaches it through `contextBridge` in `preload.js`.
 - **The JWT** is encrypted with `safeStorage` and saved in the app's data folder. It's never put in `localStorage`.
 - **Expiry:** when the token runs out, the app shows the login form again, with the username filled in.
-- **WebSocket:** the token is sent as `?token=...` when the connection opens. Status and a reconnect button are shown in the window.
+- **WebSocket:** the token is sent as `?token=...` when the connection opens. Status and a reconnect button are shown in the window. 
